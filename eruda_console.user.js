@@ -8,8 +8,8 @@
 // @match        https://*/*
 // @grant        GM_registerMenuCommand
 // @run-at       document-end
-// @downloadURL https://raw.githubusercontent.com/eitanliu/user_script/refs/heads/master/eruda_console.user.js
-// @updateURL https://github.com/eitanliu/user_script/raw/refs/heads/master/eruda_console.user.js
+// @downloadURL https://raw.githubusercontent.com/eitanliu/user_script/refs/heads/main/eruda_console.user.js
+// @updateURL https://github.com/eitanliu/user_script/raw/refs/heads/main/eruda_console.user.js
 // ==/UserScript==
 
 (function () {
