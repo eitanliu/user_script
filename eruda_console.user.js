@@ -13,61 +13,61 @@
 // ==/UserScript==
 
 (function () {
-    'use strict';
+  'use strict';
 
-    const JSURL = 'https://cdn.jsdelivr.net/npm/eruda@3.2.1/eruda.min.js'
-    function loadScript(url, callback) {
-        if (document.querySelector("#eruda")) {
-            callback();
-            return
-        }
-        const script = document.createElement('script');
-        script.setAttribute("id", "eruda")
-        script.type = 'text/javascript';
+  const JSURL = 'https://cdn.jsdelivr.net/npm/eruda@3.2.1/eruda.min.js'
+  function loadScript(url, callback) {
+    if (document.querySelector("#eruda")) {
+      callback();
+      return
+    }
+    const script = document.createElement('script');
+    script.setAttribute("id", "eruda")
+    script.type = 'text/javascript';
 
-        script.onload = function () {
-            callback();
-        };
+    script.onload = function () {
+      callback();
+    };
 
-        script.src = url;
-        document.head.appendChild(script);
+    script.src = url;
+    document.head.appendChild(script);
+  }
+
+  let show = true;
+
+  try {
+    if (show) {
+      loadScript(JSURL, () => {
+        eruda.init({
+          useShadowDom: true,
+          autoScale: true,
+          defaults: {
+            displaySize: 40,
+            transparency: 0.9
+          }
+        });
+      });
     }
 
-    let show = true;
-
-    try {
-        if (show) {
-            loadScript(JSURL, () => {
-                eruda.init({
-                    useShadowDom: true,
-                    autoScale: true,
-                    defaults: {
-                        displaySize: 40,
-                        transparency: 0.9
-                    }
-                });
-            });
-        }
-
-        GM_registerMenuCommand("打开/关闭", function (event) {
-            show = !show;
-            if (show) {
-                loadScript(JSURL, () => {
-                    eruda.init({
-                        useShadowDom: true,
-                        autoScale: true,
-                        defaults: {
-                            displaySize: 40,
-                            transparency: 0.9
-                        }
-                    });
-                });
-            } else {
-                eruda && eruda.destroy();
+    GM_registerMenuCommand("打开/关闭", function (event) {
+      show = !show;
+      if (show) {
+        loadScript(JSURL, () => {
+          eruda.init({
+            useShadowDom: true,
+            autoScale: true,
+            defaults: {
+              displaySize: 40,
+              transparency: 0.9
             }
-        }, "openEruda");
+          });
+        });
+      } else {
+        eruda && eruda.destroy();
+      }
+    }, "openEruda");
 
-    } catch (ex) {
-    }
+  } catch (ex) {
+  }
 
 })();
