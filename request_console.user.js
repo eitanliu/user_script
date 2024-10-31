@@ -108,11 +108,28 @@
     _originalXHR = window.XMLHttpRequest;
     let isDebug = _xhrTools.isDebug();
 
-    window.XMLHttpRequest = function () {
-      let request;
+    let originalOpen = window.XMLHttpRequest.prototype.open
+    /**
+     * method: string, url: string | URL, async: boolean, username?: string | null, password?: string | null
+     * @param {string} method
+     * @param {string | URL} url
+     * @param {boolean} async
+     * @param {string | null} user
+     * @param {string | null} password
+     * @returns
+     */
+    window.XMLHttpRequest.prototype.open = function (method, url, async, user, password) {
       let requestHeaders = {};
+      let request = {
+        'url': url,
+        'method': method,
+        'headers': requestHeaders,
+        'async': async,
+        'user': user,
+        'password': password,
+      };
 
-      let xhr = new _originalXHR();
+      let xhr = this;
 
       let originalSetRequestHeader = xhr.setRequestHeader;
       /**
@@ -125,30 +142,6 @@
         return originalSetRequestHeader.apply(this, arguments);
       }
       xhr.setRequestHeader = setRequestHeader;
-
-      let originalOpen = xhr.open;
-      /**
-       * method: string, url: string | URL, async: boolean, username?: string | null, password?: string | null
-       * @param {string} method 
-       * @param {string | URL} url 
-       * @param {boolean} async 
-       * @param {string | null} user 
-       * @param {string | null} password 
-       * @returns 
-       */
-      function open(method, url, async, user, password) {
-        request = {
-          'url': url,
-          'method': method,
-          'headers': requestHeaders,
-          'async': async,
-          'user': user,
-          'password': password,
-        };
-        return originalOpen.apply(this, arguments);
-      };
-      xhr.open = open;
-
       let originalSend = xhr.send;
       /**
        * @param {Document | XMLHttpRequestBodyInit | null} data 
@@ -205,7 +198,7 @@
       };
       xhr.send = send;
 
-      return xhr;
+      return originalOpen.apply(this, arguments);
     };
   }
 
@@ -217,8 +210,8 @@
     _originalFetch = window.fetch;
 
     /**
-     * @param {URL|RequestInfo} input 
-     * @param {RequestInit|undefined} init 
+     * @param {URL|RequestInfo} input
+     * @param {RequestInit|undefined} init
      * @returns {Promise<Response>}
      */
     function xFetch(input, init) {
@@ -305,14 +298,12 @@
     window.fetch = xFetch;
   }
 
-  window.addEventListener("load", (event) => {
-    if (_xhrTools.isDebug()) eruda.init({
-      useShadowDom: true,
-      autoScale: true,
-      defaults: {
-        displaySize: 40,
-        transparency: 0.95
-      }
-    });
+  if (_xhrTools.isDebug()) eruda.init({
+    useShadowDom: true,
+    autoScale: true,
+    defaults: {
+      displaySize: 40,
+      transparency: 0.95
+    }
   });
 })();
