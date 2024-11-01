@@ -31,18 +31,23 @@
       console.log(`XHR onPageChange ${event} ${host} ${path}`, url)
     },
     /**
-     * @param {any|string|String} headers 
+     * @param {any|string|String|Headers} headers 
      * @returns 
      */
     parseHeaders(headers) {
+      var headerMap = {};
       if (typeof headers === 'string' || headers instanceof String) {
-        var headerMap = {};
         headers.split(/\r?\n/).forEach(line => {
           var index = line.indexOf(': ');
           var key = line.substring(0, index);
           var value = line.substring(index + 2);
           if (key.trim() !== '') headerMap[key] = value;
         });
+        return headerMap;
+      } else if(headers instanceof Headers) {
+        for (let pair of headers) {
+          respHeaders[pair[0]] = pair[1];
+        }
         return headerMap;
       }
       return headers;
@@ -178,6 +183,7 @@
               let content = _hri.parseData(xhr.response, contentType);
 
               let response = {
+                'url': resUrl,
                 'status': xhr.status,
                 'headers': headers,
                 'contentType': contentType,
@@ -231,7 +237,7 @@
         // input instanceof Request;
         reqUrl = input.url;
         method = input.method || 'GET';
-        reqHeaders = input.headers;
+        reqHeaders = _hri.parseHeaders(input.headers);
       }
       let reqContentType = reqHeaders?.['Content-Type'] || reqHeaders?.['content-type'];
       let reqData = _hri.parseData(init?.body, reqContentType);
@@ -273,6 +279,7 @@
               console.log('ParseData Error Type: ', contentType, '\nData: ', content, '\nError: ', error);
             }
             let response = {
+              'url': resUrl,
               'status': resp.status,
               'headers': respHeaders,
               'contentType': contentType,

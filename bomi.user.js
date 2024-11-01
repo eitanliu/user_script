@@ -25,7 +25,7 @@
     onPageChange(event, url) {
       let host = url.host;
       let path = url.pathname;
-      console.log(`BOMI onPageChange ${event} ${host} ${path}`, url)
+      if (_bomi.isDebug()) console.log(`BOMI onPageChange ${event} ${host} ${path}`, url)
       if (_bomi.existsWindowProperty('_xbomi.onPageChange')) {
         _xbomi.onPageChange(event, JSON.stringify(url))
       }
@@ -61,7 +61,7 @@
           }, {});
         }
       } catch (error) {
-        console.log('ParseData Error Type: ', contentType, '\nData: ', data, '\nError: ', error);
+        if (_bomi.isDebug()) console.log('ParseData Error Type: ', contentType, '\nData: ', data, '\nError: ', error);
         return data;
       }
       return data;
@@ -99,22 +99,15 @@
     }
   };
 
-  window.addEventListener("load", (event) => {
-    console.log(`BOMI load ${location.href}`, location);
-    if (_bomi.existsWindowProperty('_xbomi.windowLoaded')) {
-      _xbomi.windowLoaded(JSON.stringify(location))
-    }
-  });
-
   window.addEventListener('hashchange', (event) => {
-    console.log(`BOMI hashchange ${location.href} \nnew${event.newURL} \nold: ${event.oldURL}`, location);
+    if (_bomi.isDebug()) console.log(`BOMI hashchange ${location.href} \nnew${event.newURL} \nold: ${event.oldURL}\n`, location);
     if (_bomi.existsWindowProperty('_xbomi.hashChange')) {
       _xbomi.hashChange(JSON.stringify(location))
     }
   });
 
   window.addEventListener('popstate', (event) => {
-    // console.log(`BOMI popState ${location.href}`, location);
+    // if (_bomi.isDebug()) console.log(`BOMI popState ${location.href}`, location);
     if (_bomi.existsWindowProperty('_xbomi.popState')) {
       _xbomi.popState(JSON.stringify(location))
     }
@@ -126,7 +119,7 @@
 
   history.pushState = function (data, unused, url) {
     let result = originalPushState.apply(this, arguments);
-    // console.log(`BOMI pushState ${location.href} \nnewUrl ${url}`, location);
+    // if (_bomi.isDebug()) console.log(`BOMI pushState ${location.href} \nnewUrl ${url}\n`, location);
     if (_bomi.existsWindowProperty('_xbomi.pushState')) {
       _xbomi.pushState(JSON.stringify(location))
     }
@@ -136,7 +129,7 @@
 
   history.replaceState = function (data, unused, url) {
     let result = originalReplaceState.apply(this, arguments);
-    // console.log(`BOMI replaceState ${location.href} \nnewUrl ${url}`, location);
+    // if (_bomi.isDebug()) console.log(`BOMI replaceState ${location.href} \nnewUrl ${url}\n`, location);
     if (_bomi.existsWindowProperty('_xbomi.replaceState')) {
       _xbomi.replaceState(JSON.stringify(location))
     }
@@ -144,9 +137,16 @@
     return result
   };
 
+  document.addEventListener("DOMContentLoaded", (event) => {
+    if (_bomi.isDebug()) console.log(`BOMI domLoaded ${location.href}\n`, location);
+    if (_bomi.existsWindowProperty('_xbomi.domContentLoaded')) {
+      _xbomi.domContentLoaded(JSON.stringify(location))
+    }
+  });
+
   document.addEventListener("readystatechange", (event) => {
     let readyState = document.readyState;
-    // console.log(`BOMI readystate: ${readyState} ${location.href}`, location);
+    // if (_bomi.isDebug()) console.log(`BOMI readystate: ${readyState} ${location.href}\n`, location);
     if (_bomi.existsWindowProperty('_xbomi.readyStateChange')) {
       _xbomi.readyStateChange(readyState, JSON.stringify(location))
     }
@@ -161,10 +161,10 @@
     }
   });
 
-  document.addEventListener("DOMContentLoaded", (event) => {
-    console.log(`BOMI domLoaded ${location.href}`, location);
-    if (_bomi.existsWindowProperty('_xbomi.domContentLoaded')) {
-      _xbomi.domContentLoaded(JSON.stringify(location))
+  window.addEventListener("load", (event) => {
+    if (_bomi.isDebug()) console.log(`BOMI load ${location.href}\n`, location);
+    if (_bomi.existsWindowProperty('_xbomi.windowLoaded')) {
+      _xbomi.windowLoaded(JSON.stringify(location))
     }
   });
 
