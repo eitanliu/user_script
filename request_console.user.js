@@ -15,7 +15,9 @@
 
 (function () {
   'use strict';
-  var _xhrTools = {
+  var _hri = {
+    _originalXHR: undefined,
+    _originalFetch: undefined,
     isDebug() {
       return true;
     },
@@ -71,7 +73,7 @@
      * @returns {boolean}
      */
     existsWindowProperty(path) {
-      return _xhrTools.existsPathProperty(window, path)
+      return _hri.existsPathProperty(window, path)
     },
     /**
      * @param {*} obj
@@ -81,7 +83,7 @@
     existsPathProperty(obj, path) {
       if (typeof obj === 'undefined' || obj === null) return false;
       const parts = path.split('.');
-      return _xhrTools.existsPartsProperty(obj, parts)
+      return _hri.existsPartsProperty(obj, parts)
     },
     /**
      *
@@ -103,10 +105,9 @@
   /**
    * @type {new XMLHttpRequest}
    */
-  let _originalXHR;
-  if (typeof _originalXHR === 'undefined') {
-    _originalXHR = window.XMLHttpRequest;
-    let isDebug = _xhrTools.isDebug();
+  if (typeof _hri._originalXHR === 'undefined') {
+    _hri._originalXHR = window.XMLHttpRequest;
+    let isDebug = _hri.isDebug();
 
     let originalOpen = window.XMLHttpRequest.prototype.open
     /**
@@ -158,7 +159,7 @@
             let method = request.method;
             let reqUrl = request.url;
             let reqContentType = requestHeaders['Content-Type'];
-            let reqData = _xhrTools.parseData(data, reqContentType);
+            let reqData = _hri.parseData(data, reqContentType);
             request['contentType'] = reqContentType;
             request['content'] = reqData;
 
@@ -172,9 +173,9 @@
 
             if (isDebug) {
 
-              let headers = _xhrTools.parseHeaders(xhr.getAllResponseHeaders());
+              let headers = _hri.parseHeaders(xhr.getAllResponseHeaders());
               let contentType = xhr.getResponseHeader('Content-Type') || xhr.getResponseHeader('content-type');
-              let content = _xhrTools.parseData(xhr.response, contentType);
+              let content = _hri.parseData(xhr.response, contentType);
 
               let response = {
                 'status': xhr.status,
@@ -206,8 +207,9 @@
    * @type {function(input, init): Promise<Response>}
    */
   let _originalFetch;
-  if (typeof _originalFetch === 'undefined') {
+  if (typeof _hri._originalFetch === 'undefined') {
     _originalFetch = window.fetch;
+    _hri._originalFetch = _originalFetch;
 
     /**
      * @param {URL|RequestInfo} input
@@ -215,7 +217,7 @@
      * @returns {Promise<Response>}
      */
     function xFetch(input, init) {
-      let isDebug = _xhrTools.isDebug();
+      let isDebug = _hri.isDebug();
       let startTime = new Date().getTime();
       let method;
       let reqUrl;
@@ -232,7 +234,7 @@
         reqHeaders = input.headers;
       }
       let reqContentType = reqHeaders?.['Content-Type'] || reqHeaders?.['content-type'];
-      let reqData = _xhrTools.parseData(init?.body, reqContentType);
+      let reqData = _hri.parseData(init?.body, reqContentType);
       let request = {
         'url': reqUrl,
         'method': method,
@@ -265,7 +267,7 @@
               if (contentType && contentType.includes('application/json')) {
                 content = await resp2.json()
               } else {
-                content = await resp2.arrayBuffer()
+                content = resp2
               }
             } catch (error) {
               console.log('ParseData Error Type: ', contentType, '\nData: ', content, '\nError: ', error);
@@ -274,7 +276,7 @@
               'status': resp.status,
               'headers': respHeaders,
               'contentType': contentType,
-              'content': _xhrTools.parseData(content, contentType)
+              'content': _hri.parseData(content, contentType)
             };
 
             resource['response'] = response;
@@ -298,12 +300,14 @@
     window.fetch = xFetch;
   }
 
-  if (_xhrTools.isDebug()) eruda.init({
-    useShadowDom: true,
-    autoScale: true,
-    defaults: {
-      displaySize: 40,
-      transparency: 0.95
-    }
+  window.addEventListener("load", (event) => {
+    if (_hri.isDebug()) eruda.init({
+      useShadowDom: true,
+      autoScale: true,
+      defaults: {
+        displaySize: 40,
+        transparency: 0.95
+      }
+    });
   });
 })();
