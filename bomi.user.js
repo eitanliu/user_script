@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name         bomi
-// @namespace    http://tampermonkey.net/
-// @version      2024-06-18
-// @description  try to take over the world!
-// @author       eitanliu
-// @match        http://*/*
-// @match        https://*/*
-// @icon         data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAtOTYwIDk2MCA5NjAiIHdpZHRoPSIyNHB4IiBmaWxsPSJ1bmRlZmluZWQiPjxwYXRoIGQ9Ik0zNTItMTIwSDIwMHEtMzMgMC01Ni41LTIzLjVUMTIwLTIwMHYtMTUycTQ4IDAgODQtMzAuNXQzNi03Ny41cTAtNDctMzYtNzcuNVQxMjAtNTY4di0xNTJxMC0zMyAyMy41LTU2LjVUMjAwLTgwMGgxNjBxMC00MiAyOS03MXQ3MS0yOXE0MiAwIDcxIDI5dDI5IDcxaDE2MHEzMyAwIDU2LjUgMjMuNVQ4MDAtNzIwdjE2MHE0MiAwIDcxIDI5dDI5IDcxcTAgNDItMjkgNzF0LTcxIDI5djE2MHEwIDMzLTIzLjUgNTYuNVQ3MjAtMTIwSDU2OHEwLTUwLTMxLjUtODVUNDYwLTI0MHEtNDUgMC03Ni41IDM1VDM1Mi0xMjBabS0xNTItODBoODVxMjQtNjYgNzctOTN0OTgtMjdxNDUgMCA5OCAyN3Q3NyA5M2g4NXYtMjQwaDgwcTggMCAxNC02dDYtMTRxMC04LTYtMTR0LTE0LTZoLTgwdi0yNDBINDgwdi04MHEwLTgtNi0xNHQtMTQtNnEtOCAwLTE0IDZ0LTYgMTR2ODBIMjAwdjg4cTU0IDIwIDg3IDY3dDMzIDEwNXEwIDU3LTMzIDEwNHQtODcgNjh2ODhabTI2MC0yNjBaIi8+PC9zdmc+
-// @grant        none
+// @name           BOMI
+// @namespace      http://tampermonkey.net/
+// @version        1.0.0
+// @description    Browser Object Model Plateform Interface
+// @author         eitanliu
+// @match          http://*/*
+// @match          https://*/*
+// @icon           data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAtOTYwIDk2MCA5NjAiIHdpZHRoPSIyNHB4IiBmaWxsPSJ1bmRlZmluZWQiPjxwYXRoIGQ9Ik0zNTItMTIwSDIwMHEtMzMgMC01Ni41LTIzLjVUMTIwLTIwMHYtMTUycTQ4IDAgODQtMzAuNXQzNi03Ny41cTAtNDctMzYtNzcuNVQxMjAtNTY4di0xNTJxMC0zMyAyMy41LTU2LjVUMjAwLTgwMGgxNjBxMC00MiAyOS03MXQ3MS0yOXE0MiAwIDcxIDI5dDI5IDcxaDE2MHEzMyAwIDU2LjUgMjMuNVQ4MDAtNzIwdjE2MHE0MiAwIDcxIDI5dDI5IDcxcTAgNDItMjkgNzF0LTcxIDI5djE2MHEwIDMzLTIzLjUgNTYuNVQ3MjAtMTIwSDU2OHEwLTUwLTMxLjUtODVUNDYwLTI0MHEtNDUgMC03Ni41IDM1VDM1Mi0xMjBabS0xNTItODBoODVxMjQtNjYgNzctOTN0OTgtMjdxNDUgMCA5OCAyN3Q3NyA5M2g4NXYtMjQwaDgwcTggMCAxNC02dDYtMTRxMC04LTYtMTR0LTE0LTZoLTgwdi0yNDBINDgwdi04MHEwLTgtNi0xNHQtMTQtNnEtOCAwLTE0IDZ0LTYgMTR2ODBIMjAwdjg4cTU0IDIwIDg3IDY3dDMzIDEwNXEwIDU3LTMzIDEwNHQtODcgNjh2ODhabTI2MC0yNjBaIi8+PC9zdmc+
+// @grant          none
 // @downloadURL https://github.com/eitanliu/user_script/raw/refs/heads/main/bomi.user.js
 // @updateURL https://github.com/eitanliu/user_script/raw/refs/heads/main/bomi.user.js
 // ==/UserScript==
@@ -16,11 +16,12 @@
   'use strict';
   var _bomi = {
     isDebug() {
+      if (_bomi.existsWindowProperty('_xbomi.isDebug')) return _xbomi.isDebug();
       return true;
     },
     /**
      * @param {string} event
-     * @param {URL} url 
+     * @param {URL} url
      */
     onPageChange(event, url) {
       let host = url.host;
@@ -31,18 +32,23 @@
       }
     },
     /**
-     * @param {any|string|String} headers 
-     * @returns 
+     * @param {any|string|String|Headers} headers
+     * @returns
      */
     parseHeaders(headers) {
+      var headerMap = {};
       if (typeof headers === 'string' || headers instanceof String) {
-        var headerMap = {};
         headers.split(/\r?\n/).forEach(line => {
           var index = line.indexOf(': ');
           var key = line.substring(0, index);
           var value = line.substring(index + 2);
           if (key.trim() !== '') headerMap[key] = value;
         });
+        return headerMap;
+      } else if (headers instanceof Headers) {
+        for (let pair of headers) {
+          headerMap[pair[0]] = pair[1];
+        }
         return headerMap;
       }
       return headers;
@@ -51,7 +57,9 @@
       if (contentType == null || !(typeof data === 'string' || data instanceof String)) return data;
 
       try {
-        if (contentType.includes('application/json')) {
+        if (contentType.includes('application/json')
+          || contentType.includes('text/json')
+        ) {
           return JSON.parse(data);
         } else if (contentType.includes('application/x-www-form-urlencoded')) {
           let params = new URLSearchParams(data);
@@ -61,7 +69,7 @@
           }, {});
         }
       } catch (error) {
-        if (_bomi.isDebug()) console.log('ParseData Error Type: ', contentType, '\nData: ', data, '\nError: ', error);
+        console.log('ParseData Error Type: ', contentType, '\nData: ', data, '\nError: ', error);
         return data;
       }
       return data;

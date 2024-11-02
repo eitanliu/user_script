@@ -1,13 +1,13 @@
 // ==UserScript==
-// @name         HttpRequest Console
-// @namespace    http://tampermonkey.net/
-// @version      2024-06-18
-// @description  try to take over the world!
-// @author       eitanliu
-// @match        http://*/*
-// @match        https://*/*
-// @icon         data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAtOTYwIDk2MCA5NjAiIHdpZHRoPSIyNHB4IiBmaWxsPSJ1bmRlZmluZWQiPjxwYXRoIGQ9Im0zMjAtMTYwLTU2LTU3IDEwMy0xMDNIODB2LTgwaDI4N0wyNjQtNTAzbDU2LTU3IDIwMCAyMDAtMjAwIDIwMFptMzIwLTI0MEw0NDAtNjAwbDIwMC0yMDAgNTYgNTctMTAzIDEwM2gyODd2ODBINTkzbDEwMyAxMDMtNTYgNTdaIi8+PC9zdmc+
-// @grant        none
+// @name           HttpRequest Console
+// @namespace      http://tampermonkey.net/
+// @version        1.0.0
+// @description    XMLHttpRequest fetch Console
+// @author         eitanliu
+// @match          http://*/*
+// @match          https://*/*
+// @icon           data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAtOTYwIDk2MCA5NjAiIHdpZHRoPSIyNHB4IiBmaWxsPSJ1bmRlZmluZWQiPjxwYXRoIGQ9Im0zMjAtMTYwLTU2LTU3IDEwMy0xMDNIODB2LTgwaDI4N0wyNjQtNTAzbDU2LTU3IDIwMCAyMDAtMjAwIDIwMFptMzIwLTI0MEw0NDAtNjAwbDIwMC0yMDAgNTYgNTctMTAzIDEwM2gyODd2ODBINTkzbDEwMyAxMDMtNTYgNTdaIi8+PC9zdmc+
+// @grant          none
 // @require https://cdn.jsdelivr.net/npm/eruda@3.3.0/eruda.min.js
 // @downloadURL https://github.com/eitanliu/user_script/raw/refs/heads/main/request_console.user.js
 // @updateURL https://github.com/eitanliu/user_script/raw/refs/heads/main/request_console.user.js
@@ -23,7 +23,7 @@
     },
     /**
      * @param {string} event
-     * @param {URL} url 
+     * @param {URL} url
      */
     onPageChange(event, url) {
       let host = url.host;
@@ -31,8 +31,8 @@
       console.log(`XHR onPageChange ${event} ${host} ${path}`, url)
     },
     /**
-     * @param {any|string|String|Headers} headers 
-     * @returns 
+     * @param {any|string|String|Headers} headers
+     * @returns
      */
     parseHeaders(headers) {
       var headerMap = {};
@@ -44,9 +44,9 @@
           if (key.trim() !== '') headerMap[key] = value;
         });
         return headerMap;
-      } else if(headers instanceof Headers) {
+      } else if (headers instanceof Headers) {
         for (let pair of headers) {
-          respHeaders[pair[0]] = pair[1];
+          headerMap[pair[0]] = pair[1];
         }
         return headerMap;
       }
@@ -139,9 +139,9 @@
 
       let originalSetRequestHeader = xhr.setRequestHeader;
       /**
-       * @param {string} name 
-       * @param {string} value 
-       * @returns 
+       * @param {string} name
+       * @param {string} value
+       * @returns
        */
       function setRequestHeader(name, value) {
         requestHeaders[name] = value
@@ -150,8 +150,8 @@
       xhr.setRequestHeader = setRequestHeader;
       let originalSend = xhr.send;
       /**
-       * @param {Document | XMLHttpRequestBodyInit | null} data 
-       * @returns 
+       * @param {Document | XMLHttpRequestBodyInit | null} data
+       * @returns
        */
       function send(data) {
         let startTime = new Date().getTime();
@@ -170,6 +170,7 @@
 
             let resUrl = xhr.responseURL;
             let resource = {
+              'url': resUrl,
               'location': window.location,
               'request': request,
               'duration': duration,
@@ -183,7 +184,6 @@
               let content = _hri.parseData(xhr.response, contentType);
 
               let response = {
-                'url': resUrl,
                 'status': xhr.status,
                 'headers': headers,
                 'contentType': contentType,
@@ -255,6 +255,7 @@
           let endTime = new Date().getTime();
           let duration = endTime - startTime;
           let resource = {
+            'url': resUrl,
             'location': window.location,
             'request': request,
             'duration': duration,
@@ -279,7 +280,6 @@
               console.log('ParseData Error Type: ', contentType, '\nData: ', content, '\nError: ', error);
             }
             let response = {
-              'url': resUrl,
               'status': resp.status,
               'headers': respHeaders,
               'contentType': contentType,
