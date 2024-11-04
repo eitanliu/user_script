@@ -9,6 +9,7 @@
 // @icon           data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAtOTYwIDk2MCA5NjAiIHdpZHRoPSIyNHB4IiBmaWxsPSJ1bmRlZmluZWQiPjxwYXRoIGQ9Ik0xNjAtMTYwcS0zMyAwLTU2LjUtMjMuNVQ4MC0yNDB2LTQ4MHEwLTMzIDIzLjUtNTYuNVQxNjAtODAwaDY0MHEzMyAwIDU2LjUgMjMuNVQ4ODAtNzIwdjQ4MHEwIDMzLTIzLjUgNTYuNVQ4MDAtMTYwSDE2MFptMC04MGg2NDB2LTQwMEgxNjB2NDAwWm0xNDAtNDAtNTYtNTYgMTAzLTEwNC0xMDQtMTA0IDU3LTU2IDE2MCAxNjAtMTYwIDE2MFptMTgwIDB2LTgwaDI0MHY4MEg0ODBaIi8+PC9zdmc+
 // @grant          GM_registerMenuCommand
 // @run-at         document-end
+// @require https://cdn.jsdelivr.net/npm/path-to-regexp/dist/index.min.js
 // @downloadURL https://raw.githubusercontent.com/eitanliu/user_script/refs/heads/main/eruda_console.user.js
 // @updateURL https://github.com/eitanliu/user_script/raw/refs/heads/main/eruda_console.user.js
 // ==/UserScript==

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           HttpRequest Console
 // @namespace      http://tampermonkey.net/
-// @version        1.0.0
+// @version        1.0.1
 // @description    XMLHttpRequest fetch Console
 // @author         eitanliu
 // @match          http://*/*
@@ -18,6 +18,9 @@
   var _hri = {
     _originalXHR: undefined,
     _originalFetch: undefined,
+    isConsole() {
+      return true;
+    },
     isDebug() {
       return true;
     },
@@ -52,6 +55,16 @@
       }
       return headers;
     },
+    parseUrl(url, base) {
+      try {
+        if (base === undefined || base === null || base == '')
+          return new URL(url)
+        else
+          return new URL(url, base);
+      } catch (e) {
+      }
+      return url;
+    },
     parseData(data, contentType) {
       if (contentType == null || !(typeof data === 'string' || data instanceof String)) return data;
 
@@ -68,8 +81,7 @@
           }, {});
         }
       } catch (error) {
-        console.log('ParseData Error Type: ', contentType, '\nData: ', data, '\nError: ', error);
-        return data;
+        // console.log('ParseData Error Type: ', contentType, '\nData: ', data, '\nError: ', error);
       }
       return data;
     },
@@ -193,7 +205,7 @@
               resource['response'] = response;
 
               if (isDebug) {
-                console.log(`Request: ${method} xhr ${reqUrl}\nResponse: ${contentType} ${resUrl}\n`, resource);
+                console.log(`Request: ${method} xhr ${_hri.parseUrl(reqUrl, location.href)}\nResponse: ${xhr.status} ${contentType} ${resUrl}\n`, resource);
               }
             }
           }
@@ -290,7 +302,7 @@
 
 
             if (isDebug) {
-              console.log(`Request: ${method} fetch ${reqUrl}\nResponse: ${contentType} ${resUrl}\n`, resource);
+              console.log(`Request: ${method} xhr ${_hri.parseUrl(reqUrl, location.href)}\nResponse: ${resp.status} ${contentType} ${resUrl}\n`, resource);
             }
           }
           return resp;
@@ -298,7 +310,7 @@
           let endTime = new Date().getTime();
           let duration = endTime - startTime;
           if (isDebug) {
-            console.log(`RequestError: ${method} ${reqUrl}\n ${duration}\n`, error);
+            console.log(`RequestError: ${method} ${_hri.parseUrl(reqUrl, location.href)}\n ${duration}\n`, error);
           }
           throw error;
         });
@@ -308,7 +320,7 @@
   }
 
   window.addEventListener("load", (event) => {
-    if (_hri.isDebug()) eruda.init({
+    if (_hri.isConsole()) eruda.init({
       useShadowDom: true,
       autoScale: true,
       defaults: {
